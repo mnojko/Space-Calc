@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @font-face {
+            font-family: "Orbitron";
+            font-weight: normal;
+            font-style: normal;
+            src: url('Fonts/Orbitron/Orbitron-Regular.ttf');
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: #00f5d4;
+            font-size: 18px;
+            font-family: "Orbitron";
+            background: radial-gradient(circle at bottom, rgb(27, 15, 33), rgb(23, 23, 29));
+            background-repeat: no-repeat;
+            background-size: cover;
+            overflow: hidden;
+            cursor: default;
+        }
+        body {
+            height: 100vh;
+            width: 100vw;
+            position: relative;
+            z-index: 1;
+            display: flex;
+        }
+
+
+        /* stars */
+        #stars1Container,
+        #stars2Container,
+        #stars3Container {
+            will-change: transform;
+        }
+        #stars1Container,
+        #stars1Star,
+        #stars1Star::after,
+        #stars1Glow,
+        #stars1Glow::after,
+        #stars2Container,
+        #stars2Star,
+        #stars2Star::after,
+        #stars2Glow,
+        #stars2Glow::after,
+        #stars3Container,
+        #stars3Star,
+        #stars3Star::after,
+        #stars3Glow,
+        #stars3Glow::after {
+            background: transparent;
+        }
+        #stars2Star,
+        #stars2Star::after,
+        #stars2Glow,
+        #stars2Glow::after,
+        #stars3Star,
+        #stars3Star::after,
+        #stars3Glow,
+        #stars3Glow::after {
+            border-radius: 50%;
+        }
+        #stars1Container {
+            animation: animateStars1 50s linear infinite;
+        }
+        #stars1Star {
+            height: 1px;
+            width: 1px;
+            box-shadow: none;
+            animation: pulse-forward 2s linear infinite;
+        }
+        #stars1Glow {
+            height: 2px;
+            width: 2px;
+            box-shadow: none;
+            animation: pulse-forward 2s linear infinite;
+        }
+        #stars2Container {
+            animation: animateStars1 75s linear infinite;
+        }
+        #stars2Star {
+            height: 2px;
+            width: 2px;
+            box-shadow: none;
+            animation: pulse-forward 3s linear infinite;
+            animation-delay: 1.5s;
+        }
+        #stars2Glow {
+            height: 2px;
+            width: 2px;
+            box-shadow: none;
+            animation: pulse-forward 3s linear infinite;
+            animation-delay: 1.5s;
+        }
+        #stars3Container {
+            animation: animateStars1 100s linear infinite;
+        }
+        #stars3Star {
+            height: 3px;
+            width: 3px;
+            box-shadow: none;
+            animation: pulse-reverse 4s linear infinite;
+        }
+        #stars3Glow {
+            height: 3px;
+            width: 3px;
+            box-shadow: none;
+            animation: pulse-reverse 4s linear infinite;
+        }
+
+
+
+        /* calculator */
+        .calc-container {
+            z-index: 5;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transform: translateZ(0);
+        }
+        .display {
+            height: 115px;
+            width: 381px;
+            font-size: 1.6rem;
+            box-shadow:
+            inset 1px 1px 1px rgba(0, 0, 0, 0.5),
+            inset -1px -1px 1px rgba(0, 0, 0, 0.5),
+            inset -1px 1px 1px rgba(0, 0, 0, 0.5),
+            inset 1px -1px 1px rgba(0, 0, 0, 0.5),
+            inset 20px 20px 100px rgb(0, 0, 0, 0.2),
+            inset 5px 5px 100px rgba(255, 255, 255, 0.2),
+            inset -2px -2px 10px rgba(255, 255, 255, 0.1);
+            z-index: 7;
+            cursor: text;
+            backdrop-filter: blur(1px) contrast(1.1);
+            -webkit-backdrop-filter: blur(1px) contrast(1.1);
+        }
+        .display::selection {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+        .display::-moz-selection {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+        .divider {
+            height: 30px;
+        }
+        .calculator {
+            height: 500x;
+            width: 381px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            gap: 20px;
+            position: relative;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+        .digit,
+        .operator,
+        .other {
+            cursor: pointer;
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            height: 80px;
+            width: 80px;
+            z-index: 6;
+            position: relative;
+            background-color: rgba(32, 23, 37, 1);
+        }
+        .before,
+        .after {
+            border-radius: 10px;
+            pointer-events: none;
+        }
+        .before {
+            z-index: 5;
+            background-color: rgba(32, 23, 37, 1);
+            transform: translateZ(-1px);
+        }
+        .after {
+            z-index: 7;
+            box-shadow: inset 0px 0px 10px #00f5d477;
+            background-color: rgba(32, 23, 37, 0);
+            transform: translateZ(1px);
+        }
+        .digit,
+        .operator,
+        .other {
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+        .active {
+            transform: translateZ(-250px);
+        }
+        .glow {
+            background-color: rgba(0, 245, 212, 0.1);
+        } 
+        .digit,
+        .operator,
+        .other,
+        .display {
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+        .one {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        .two {
+            grid-column: 2;
+            grid-row: 2;
+        }
+        .three {
+            grid-column: 3;
+            grid-row: 2;
+        }
+        .four {
+            grid-column: 1;
+            grid-row: 3;
+        }
+        .five {
+            grid-column: 2;
+            grid-row: 3;
+        }
+        .six {
+            grid-column: 3;
+            grid-row: 3;
+        }
+        .seven {
+            grid-column: 1;
+            grid-row: 4;
+        }
+        .eight {
+            grid-column: 2;
+            grid-row: 4;
+        }
+        .nine {
+            grid-column: 3;
+            grid-row: 4;
+        }
+        .zero {
+            grid-column-start: 1;
+            grid-column-end: span 2;
+            grid-row: 5;
+            width: 180px;
+        }
+        .decimal {
+            grid-column: 3;
+            grid-row: 5;
+        }
+        .divide {
+            grid-column: 4;
+            grid-row: 1;
+        }
+        .multiply {
+            grid-column: 4;
+            grid-row: 2;
+        }
+        .subtract {
+            grid-column: 4;
+            grid-row: 3;
+        }
+        .add {
+            grid-column: 4;
+            grid-row: 4;
+        }
+        .equals {
+            grid-column: 4;
+            grid-row: 5;
+        }
+        .clear {
+            grid-column: 1;
+            grid-row: 1;
+        }
+        .flip {
+            grid-column: 2;
+            grid-row: 1;
+        }
+        .percentage {
+            grid-column: 3;
+            grid-row: 1;
+        }
+        .display {
+            grid-column-start: 1;
+            grid-column-end: span 4;
+            grid-row-start: 1;
+            grid-row-end: span 3;
+        }
+
+        /* animations */
+        @keyframes animateStars1 {
+            from {
+                transform: translateY(0px);
+            }
+            to {
+                transform: translateY(-1600px);
+            }
+        }
+        @keyframes pulse-forward {
+            0% { opacity: 0.85; }
+            50% { opacity: 1; }
+            100% { opacity: 0.85; }
+        }
+        @keyframes pulse-reverse {
+            0% { opacity: 1; }
+            50% { opacity: 0.85; }
+            100% { opacity: 1; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars">
+        <div id="stars1Container">
+            <div id="stars1Star"></div>
+            <div id="stars1Glow"></div>
+        </div>
+        <div id="stars2Container">
+            <div id="stars2Star"></div>
+            <div id="stars2Glow"></div>
+        </div>
+        <div id="stars3Container">
+            <div id="stars3Star"></div>
+            <div id="stars3Glow"></div>
+        </div>
+    </div>
+    <div class="calc-container">
+        <div class="display">0</div>
+        <div class="divider"></div>
+        <div class="calculator">
+            <div class="button digit one" data-select="one" data-value="1">1</div>
+            <div class="button digit one before" data-select="one" data-value="1"></div>
+            <div class="button digit one after" data-select="one" data-value="1"></div>
+
+            <div class="button digit two" data-select="two" data-value="2">2</div>
+            <div class="button digit two before" data-select="two" data-value="2"></div>
+            <div class="button digit two after" data-select="two" data-value="2"></div>
+
+            <div class="button digit three" data-select="three" data-value="3">3</div>
+            <div class="button digit three before" data-select="three" data-value="3"></div>
+            <div class="button digit three after" data-select="three" data-value="3"></div>
+
+            <div class="button digit four" data-select="four" data-value="4">4</div>
+            <div class="button digit four before" data-select="four" data-value="4"></div>
+            <div class="button digit four after" data-select="four" data-value="4"></div>
+
+            <div class="button digit five" data-select="five" data-value="5">5</div>
+            <div class="button digit five before" data-select="five" data-value="5"></div>
+            <div class="button digit five after" data-select="five" data-value="5"></div>
+
+            <div class="button digit six" data-select="six" data-value="6">6</div>
+            <div class="button digit six before" data-select="six" data-value="6"></div>
+            <div class="button digit six after" data-select="six" data-value="6"></div>
+
+            <div class="button digit seven" data-select="seven" data-value="7">7</div>
+            <div class="button digit seven before" data-select="seven" data-value="7"></div>
+            <div class="button digit seven after" data-select="seven" data-value="7"></div>
+
+            <div class="button digit eight" data-select="eight" data-value="8">8</div>
+            <div class="button digit eight before" data-select="eight" data-value="8"></div>
+            <div class="button digit eight after" data-select="eight" data-value="8"></div>
+
+            <div class="button digit nine" data-select="nine" data-value="9">9</div>
+            <div class="button digit nine before" data-select="nine" data-value="9"></div>
+            <div class="button digit nine after" data-select="nine" data-value="9"></div>
+
+            <div class="button digit zero" data-select="zero" data-value="0">0</div>
+            <div class="button digit zero before" data-select="zero" data-value="0"></div>
+            <div class="button digit zero after" data-select="zero" data-value="0"></div>
+
+            <div class="button digit decimal" data-select="decimal" data-value=".">.</div>
+            <div class="button digit decimal before" data-select="decimal" data-value="."></div>
+            <div class="button digit decimal after" data-select="decimal" data-value="."></div>
+            
+            <div class="button operator divide" data-select="divide" data-value="/">÷</div>
+            <div class="button operator divide before" data-select="divide" data-value="/"></div>
+            <div class="button operator divide after" data-select="divide" data-value="/"></div>
+
+            <div class="button operator multiply" data-select="multiply" data-value="*">·</div>
+            <div class="button operator multiply before" data-select="multiply" data-value="*"></div>
+            <div class="button operator multiply after" data-select="multiply" data-value="*"></div>
+
+            <div class="button operator subtract" data-select="subtract" data-value="-">-</div>
+            <div class="button operator subtract before" data-select="subtract" data-value="-"></div>
+            <div class="button operator subtract after" data-select="subtract" data-value="-"></div>
+
+            <div class="button operator add" data-select="add" data-value="+">+</div>
+            <div class="button operator add before" data-select="add" data-value="+"></div>
+            <div class="button operator add after" data-select="add" data-value="+"></div>
+
+            <div class="button operator equals" data-select="equals" data-value="=">=</div>
+            <div class="button operator equals before" data-select="equals" data-value="="></div>
+            <div class="button operator equals after" data-select="equals" data-value="="></div>
+
+            <div class="button other clear" data-select="clear" data-value="c">C</div>
+            <div class="button other clear before" data-select="clear" data-value="c"></div>
+            <div class="button other clear after" data-select="clear" data-value="c"></div>
+
+            <div class="button other flip" data-select="flip" data-value="±">±</div>
+            <div class="button other flip before" data-select="flip" data-value="±"></div>
+            <div class="button other flip after" data-select="flip" data-value="±"></div>
+
+            <div class="button other percentage" data-select="percentage" data-value="%">%</div>
+            <div class="button other percentage before" data-select="percentage" data-value="%"></div>
+            <div class="button other percentage after" data-select="percentage" data-value="%"></div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", (event) => {
+            const calculator = document.querySelector('.calculator');
+            calculator.focus();
+
+            lucide.createIcons();
+        });
+
+        const display = document.querySelector('.display');
+        const buttons = document.querySelectorAll('.button');
+
+        document.addEventListener('mousedown', filterEvent);
+        document.addEventListener('mouseup', filterEvent);
+        window.addEventListener('keydown', filterEvent);
+        window.addEventListener('keyup', filterEvent);
+
+        let lastPressedButton = null;
+        let userInput = '0';
+        let previousInput = null;
+        let lastOperator = null;
+        let isLocked = false;
+
+        function filterEvent(event) {
+            if (event.type === 'mousedown' && event.target.classList.contains('button')) {
+                lastPressedButton = event.target;
+                mousedown(event);
+            }
+            if (event.type === 'mouseup' && lastPressedButton) {
+                mouseup({target: lastPressedButton});
+                lastPressedButton = null;
+            }
+            if (event.type === 'keydown') {
+                if (event.key === 'Backspace') {
+                    backspace(event);
+                } else if (event.key === 'Enter') {
+                    keydown({key: '=', type: 'keydown'})
+                } else if (event.key === 'a' || event.key === 'Escape') {
+                    keydown({key: 'c', type: 'keydown'})
+                } else {
+                    keydown(event);
+                }
+            }
+            if (event.type === 'keyup') {
+                if (event.key === 'Enter') {
+                    keyup({key: '=', type: 'keyup'})
+                } else if (event.key === 'a' || event.key === 'Escape') {
+                    keyup({key: 'c', type: 'keyup'})
+                } else {
+                    keyup(event);
+                }
+            }
+        }
+        function mousedown(event) {
+            let toAnimate = document.querySelectorAll(`.${event.target.dataset.select}`);
+            toAnimate.forEach((activated) => {
+                activated.classList.add('active');
+                if (activated.classList.contains('after')) {
+                    activated.classList.add('glow');
+                }
+            })
+            const artificialEvent = {
+                key: `${event.target.dataset.value}`,
+                type: 'mousedown'
+            };
+            typing(artificialEvent);
+        }
+        function mouseup(event) {
+            let toAnimate = document.querySelectorAll(`.${event.target.dataset.select}`);
+            toAnimate.forEach((activated) => {
+                activated.classList.remove('active');
+                if (activated.classList.contains('after')) {
+                    activated.classList.remove('glow');
+                }
+            })
+        }
+        function keydown(event) {
+            const button = document.querySelectorAll(`.button[data-value='${event.key}']`)
+            button.forEach((button) => {
+                if (button) {
+                    button.classList.add('active');
+                    if (button.classList.contains('after')) {
+                        button.classList.add('glow');
+                    }
+                }
+            });
+            typing(event);
+        }
+        function keyup(event) {
+            const button = document.querySelectorAll(`.button[data-value='${event.key}']`)
+            button.forEach((button) => {
+                if (button) {
+                    button.classList.remove('active');
+                    if (button.classList.contains('after')) {
+                        button.classList.remove('glow');
+                    }
+                }
+            });
+        }
+        function typing(event) {
+            if (isLocked === true) {
+                if (event.key === 'c') {
+                    clear();
+                }
+                return;
+            }
+            switch (event.key) {
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    if (userInput === '0') {
+                        userInput = '';
+                    }
+                    userInput += event.key;
+                    displayContent(userInput);
+                    break;
+                case '0':
+                    if (userInput === '0') {
+                        break;
+                    } else {
+                        userInput += event.key;
+                        displayContent(userInput);
+                        break;
+                    }
+                case '.':
+                    if (userInput.includes('.')) {
+                        break;
+                    } else{
+                        userInput += event.key;
+                        displayContent(userInput);
+                        break;
+                    }
+                case '/':
+                case '*':
+                case '-':
+                case '+':
+                case '=':
+                    calculate(event.key);
+                    break;
+                case '±':
+                    userInput = (parseFloat(userInput) * -1).toString();
+                    displayContent(userInput);
+                    break;
+                case '%':
+                    userInput = (parseFloat(userInput) * 0.01).toString();
+                    displayContent(userInput);
+                    break;
+                case 'c':
+                    clear();
+                    break;
+            }
+        }
+        function backspace(event) {
+            if (userInput.length > 1) {
+                    userInput = userInput.slice(0, -1);
+                } else {
+                    userInput = '0';
+                }
+            displayContent(userInput);
+            return;
+        }
+        function calculate(currentOperator) {
+            if (previousInput === null && userInput === '0') {
+                return;
+            }
+            const currentInput = parseFloat(userInput);
+            if (previousInput === null) {
+                previousInput = currentInput;
+                previousOperator = currentOperator;
+                displayContent(previousInput);
+                userInput = '';
+                return;
+            }
+            if (previousOperator === null) {
+                previousOperator = currentOperator;
+            }
+            if (previousInput !== null && previousOperator !== null && userInput !== '') {
+                let result = 0;
+                switch (previousOperator) {
+                    case '-':
+                        result = previousInput - currentInput;
+                        break;
+                    case '+':
+                        result = previousInput + currentInput;
+                        break;
+                    case '*':
+                        result = previousInput * currentInput;
+                        break;
+                    case '/':
+                        result = previousInput / currentInput;
+                        break;
+                }
+                previousInput = result;
+                if (currentOperator !== '=') {
+                    previousOperator = currentOperator;
+                } else if (currentOperator === '=') {
+                    previousOperator = null;
+                }
+                displayContent(result);
+                userInput = '';
+                if (result === Infinity) {
+                    isLocked = true;
+                }
+                return;
+            }
+        }
+        function clear() {
+            userInput = '0';
+            previousInput = null;
+            lastOperator = null;
+            isLocked = false;
+            displayContent(userInput);
+            return;
+        }
+        function displayContent(input) {
+            const maxLength = 13;
+            let displayValue = input;
+            if (displayValue.length > maxLength) {
+                displayValue = parseFloat(input).toExponential(3);
+            }
+            display.textContent = displayValue;
+            return;
+        }
+
+
+        function generateLayerOne(count, xMax, yMax, color) {
+            const stars = [];
+            for (let i = 0; i < count; i++) {
+                const x = Math.floor(Math.random() * xMax);
+                const y = Math.floor(Math.random() * yMax);
+                stars.push([x, y, color]);
+            }
+
+            document.querySelector('#stars1Star').style.boxShadow = 
+                stars.map(star => `${star[0]}px ${star[1]}px 0 ${star[2]}`).join(', ');
+
+            generateLayerOneGlow(stars);
+        }
+        function generateLayerOneGlow(stars) {
+            const glowStars = stars.map(star => {
+                const glowSize = Math.floor(Math.random() * 5) + 10;
+                return `${star[0]}px ${star[1]}px ${glowSize}px ${star[2]}`;
+            });
+
+            document.querySelector('#stars1Glow').style.boxShadow = glowStars.join(', ');
+        }
+
+        function generateLayerTwo(count, xMax, yMax, color) {
+            const stars = [];
+            for (let i = 0; i < count; i++) {
+                const x = Math.floor(Math.random() * xMax);
+                const y = Math.floor(Math.random() * yMax);
+                stars.push([x, y, color]);
+            }
+
+            document.querySelector('#stars2Star').style.boxShadow = 
+                stars.map(star => `${star[0]}px ${star[1]}px 0 ${star[2]}`).join(', ');
+
+            generateLayerTwoGlow(stars);
+        }
+        function generateLayerTwoGlow(stars) {
+            const glowStars = stars.map(star => {
+                const glowSize = Math.floor(Math.random() * 5) + 10;
+                return `${star[0]}px ${star[1]}px ${glowSize}px ${star[2]}`;
+            });
+
+            document.querySelector('#stars2Glow').style.boxShadow = glowStars.join(', ');
+        }
+
+        function generateLayerThree(count, xMax, yMax, color) {
+            const stars = [];
+            for (let i = 0; i < count; i++) {
+                const x = Math.floor(Math.random() * xMax);
+                const y = Math.floor(Math.random() * yMax);
+                stars.push([x, y, color]);
+            }
+
+            document.querySelector('#stars3Star').style.boxShadow = 
+                stars.map(star => `${star[0]}px ${star[1]}px 0 ${star[2]}`).join(', ');
+
+            generateLayerThreeGlow(stars);
+        }
+        function generateLayerThreeGlow(stars) {
+            const glowStars = stars.map(star => {
+                const glowSize = Math.floor(Math.random() * 5) + 10;
+                return `${star[0]}px ${star[1]}px ${glowSize}px ${star[2]}`;
+            });
+
+            document.querySelector('#stars3Glow').style.boxShadow = glowStars.join(', ');
+        }
+
+        generateLayerOne(1000, 7000, 5000, '#fff');
+        generateLayerTwo(1000, 7000, 5000, '#fff');
+        generateLayerThree(1000, 7000, 5000, '#fff');
+    </script>
+</body>
+</html>
